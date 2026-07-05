@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Study Planner</title>
+<title>Study Planner PRO</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -11,74 +11,50 @@
 <div class="container">
 
 <header>
-  <h1>Study Planner </h1>
-  <div>
-    <input type="text" id="search" placeholder="Search..." onkeyup="searchTask()">
-    <button onclick="toggleDark()">🌙</button>
-  </div>
+  <h1>🚀 Study Planner PRO</h1>
+  <input type="text" id="search" placeholder="Search..." onkeyup="searchTask()">
 </header>
 
+<!-- TASK -->
 <div class="input-box">
   <input id="taskInput" placeholder="New Task">
-  <input type="date" id="date">
-
-  <select id="category">
-    <option>Study</option>
-    <option>Exam</option>
-    <option>Personal</option>
-  </select>
-
-  <select id="priority">
-    <option value="High">🔥 High</option>
-    <option value="Medium">⚡ Medium</option>
-    <option value="Low">🌿 Low</option>
-  </select>
-
   <button onclick="addTask()">Add</button>
-</div>
-
-<div class="progress-box">
-  <div id="progress"></div>
 </div>
 
 <ul id="taskList"></ul>
 
-<div class="stats">
-  <p>✅ Completed: <span id="stats">0</span></p>
-  <p>🔥 Streak: <span id="streak">0</span></p>
-</div>
+<hr>
 
-<div class="timer">
-  <h2>⏱ Focus Mode</h2>
-  <select id="mode">
-    <option value="1500">25 min</option>
-    <option value="3000">50 min</option>
-  </select>
-  <div id="time">25:00</div>
-  <button onclick="start()">Start</button>
-  <button onclick="pause()">Pause</button>
-  <button onclick="reset()">Reset</button>
-  <h2>🧠 Smart Notes</h2>
+<!-- NOTES -->
+<h2>🧠 Smart Notes</h2>
 
-<div class="note-input">
-  <input id="noteTitle" placeholder="Title">
-  <textarea id="noteText" placeholder="Write your note..."></textarea>
-  <button onclick="addNote()">Save Note</button>
-</div>
-
-<input type="text" id="noteSearch" placeholder="Search notes..." onkeyup="searchNote()">
+<input id="noteTitle" placeholder="Title">
+<textarea id="noteText" placeholder="Write note..."></textarea>
+<button onclick="addNote()">Save Note</button>
 
 <div id="notes"></div>
-</div>
 
-<div class="extra">
-  <button onclick="downloadPDF()">📄 Download Notes</button>
+<hr>
 
-</div>
+<!-- FILE UPLOAD -->
+<h2>📂 Upload PDF</h2>
+<input type="file" id="fileInput" accept=".pdf">
+<button onclick="processFile()">Generate</button>
+
+<div id="output"></div>
+
+<h3>📊 Score: <span id="score">0</span></h3>
+
+<button onclick="saveGeneratedNotes()">💾 Save Notes</button>
+<button onclick="downloadGeneratedPDF()">📄 Download PDF</button>
 
 </div>
 
 <script src="script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs/dist/pptxgen.min.js"></script>
+
 </body>
 </html>
+
