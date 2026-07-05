@@ -210,10 +210,44 @@ function searchNote() {
 }
 function summarizeText(text) {
   let sentences = text.split(".");
-  
+
   if (sentences.length <= 2) return text;
 
   return sentences.slice(0, 2).join(".") + "...";
+}
+async function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF();
+
+  let y = 10;
+
+  doc.setFontSize(16);
+  doc.text("Smart Notes", 10, y);
+
+  y += 10;
+
+  notes.forEach((n, i) => {
+    doc.setFontSize(12);
+
+    doc.text(`Title: ${n.title}`, 10, y);
+    y += 6;
+
+    doc.text(`Summary: ${n.summary || ""}`, 10, y);
+    y += 6;
+
+    let splitText = doc.splitTextToSize(n.text, 180);
+    doc.text(splitText, 10, y);
+
+    y += splitText.length * 6 + 5;
+
+    // নতুন page লাগলে
+    if (y > 270) {
+      doc.addPage();
+      y = 10;
+    }
+  });
+
+  doc.save("Smart_Notes.pdf");
 }
 displayNotes();
 display();
