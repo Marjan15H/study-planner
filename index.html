@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Study Planner</title>
+<title>Study Planner PRO</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -18,18 +18,59 @@
 <!-- TASK -->
 <div class="input-box">
   <input id="taskInput" placeholder="New Task">
+  <input type="date" id="taskDate">
+  <select id="taskCategory">
+    <option value="Study">Study</option>
+    <option value="Assignment">Assignment</option>
+    <option value="Exam">Exam</option>
+    <option value="Personal">Personal</option>
+    <option value="Other">Other</option>
+  </select>
+  <select id="taskPriority">
+    <option value="High">🔥 High</option>
+    <option value="Medium">⚡ Medium</option>
+    <option value="Low">🍃 Low</option>
+  </select>
   <button onclick="addTask()">Add</button>
 </div>
 
 <ul id="taskList"></ul>
+
+<div class="progress-box">
+  <div id="progress"></div>
+</div>
+
+<p>✅ Completed: <span id="completedCount">0</span></p>
+<p>🔥 Streak: <span id="streakCount">0</span></p>
+
+<hr>
+
+<!-- FOCUS MODE -->
+<h2>⏱ Focus Mode</h2>
+<div class="timer">
+  <select id="timerDuration">
+    <option value="5">5 min</option>
+    <option value="10">10 min</option>
+    <option value="15">15 min</option>
+    <option value="25" selected>25 min</option>
+    <option value="30">30 min</option>
+    <option value="45">45 min</option>
+    <option value="60">60 min</option>
+  </select>
+  <h2 id="timerDisplay">25:00</h2>
+  <button onclick="startTimer()">Start</button>
+  <button onclick="pauseTimer()">Pause</button>
+  <button onclick="resetTimer()">Reset</button>
+</div>
 
 <hr>
 
 <!-- NOTES -->
 <h2>🧠 Smart Notes</h2>
 <input id="noteTitle" placeholder="Title">
-<textarea id="noteText" placeholder="Write note..."></textarea>
+<textarea id="noteText" placeholder="Write your note..."></textarea>
 <button onclick="addNote()">Save Note</button>
+<input type="text" id="noteSearch" placeholder="Search notes..." onkeyup="searchNotes()">
 
 <div id="notes"></div>
 
@@ -39,10 +80,10 @@
 <h2>📂 Upload PDF</h2>
 <input type="file" id="fileInput" accept=".pdf">
 
-<!-- MODE SELECT (moved below Upload PDF, above Generate) -->
+<!-- MODE SELECT -->
 <h3>Choose Mode</h3>
 <div class="mode-select">
-  <button onclick="setMode('notes')">🧠 Notes</button>
+  <button onclick="setMode('notes')" class="active-mode">🧠 Notes</button>
   <button onclick="setMode('quiz')">❓ Quiz</button>
 </div>
 
@@ -54,6 +95,11 @@
 
 <button onclick="saveGeneratedNotes()">💾 Save Notes</button>
 <button onclick="downloadGeneratedPDF()">📄 Download PDF</button>
+
+<hr>
+
+<button onclick="exportData()">📤 Export</button>
+<button onclick="clearData()">🗑 Clear</button>
 
 </div>
 

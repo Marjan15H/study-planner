@@ -1,76 +1,215 @@
+//DATA
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let notes = JSON.parse(localStorage.getItem("notes")) || [];
+let streakData = JSON.parse(localStorage.getItem("streakData")) || { count: 0, lastDate: null };
 
 let generatedNotes = "";
 let quizData = [];
-let score = 0;
 
-let mode = "notes"; // default mode
+let mode = "notes"; 
 
-// MODE
+// MODE (PDF Notes/Quiz) 
 function setMode(m) {
   mode = m;
-
-  // highlight active mode button
   document.querySelectorAll(".mode-select button").forEach(btn => {
     btn.classList.remove("active-mode");
   });
   event.target.classList.add("active-mode");
 }
 
-// TASK
+//TASKS 
 function addTask() {
-  let val = document.getElementById("taskInput").value;
-  if (!val) return;
+  let text = document.getElementById("taskInput").value.trim();
+  let date = document.getElementById("taskDate").value;
+  let category = document.getElementById("taskCategory").value;
+  let priority = document.getElementById("taskPriority").value;
 
-  tasks.push(val);
-  localStorage.setItem("tasks", JSON.stringify(tasks));
+  if (!text) return alert("Write a task!");
+
+  tasks.push({
+    id: Date.now(),
+    text,
+    date,
+    category,
+    priority,
+    completed: false
+  });
+
+  saveTasks();
+  document.getElementById("taskInput").value = "";
+  document.getElementById("taskDate").value = "";
   display();
 }
 
-function display() {
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function display(list) {
   let ul = document.getElementById("taskList");
   ul.innerHTML = "";
 
-  tasks.forEach((t, i) => {
-    ul.innerHTML += `<li>${t} <button onclick="del(${i})">❌</button></li>`;
+  let source = list || tasks;
+
+  source.forEach(t => {
+    let li = document.createElement("li");
+    li.className = t.priority || "";
+
+    let meta = [];
+    if (t.category) meta.push(t.category);
+    if (t.date) meta.push(t.date);
+
+    li.innerHTML = `
+      <span class="task-text ${t.completed ? "done" : ""}">
+        <input type="checkbox" ${t.completed ? "checked" : ""} onchange="toggleComplete(${t.id})">
+        ${t.text} ${meta.length ? `<small>(${meta.join(" • ")})</small>` : ""}
+      </span>
+      <button onclick="del(${t.id})">❌</button>
+    `;
+
+    ul.appendChild(li);
   });
+
+  updateProgress();
 }
 
-function del(i) {
-  tasks.splice(i, 1);
-  localStorage.setItem("tasks", JSON.stringify(tasks));
+function toggleComplete(id) {
+  let task = tasks.find(t => t.id === id);
+  if (!task) return;
+
+  task.completed = !task.completed;
+
+  if (task.completed) {
+    updateStreak();
+  }
+
+  saveTasks();
+  display();
+}
+
+function del(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  saveTasks();
   display();
 }
 
 function searchTask() {
   let q = document.getElementById("search").value.toLowerCase();
-  let ul = document.getElementById("taskList");
-
-  ul.innerHTML = tasks
-    .filter(t => t.toLowerCase().includes(q))
-    .map((t, i) => `<li>${t}</li>`).join("");
+  let filtered = tasks.filter(t => t.text.toLowerCase().includes(q));
+  display(filtered);
 }
 
-// NOTES
+function updateProgress() {
+  let total = tasks.length;
+  let completed = tasks.filter(t => t.completed).length;
+  let percent = total ? Math.round((completed / total) * 100) : 0;
+
+  document.getElementById("progress").style.width = percent + "%";
+  document.getElementById("completedCount").innerText = completed;
+  document.getElementById("streakCount").innerText = streakData.count;
+}
+
+//STREAK
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function updateStreak() {
+  let today = todayStr();
+
+  if (streakData.lastDate === today) {
+    
+  } else if (isYesterday(streakData.lastDate, today)) {
+    streakData.count += 1;
+    streakData.lastDate = today;
+  } else {
+    streakData.count = 1;
+    streakData.lastDate = today;
+  }
+
+  localStorage.setItem("streakData", JSON.stringify(streakData));
+}
+
+function isYesterday(lastDate, today) {
+  if (!lastDate) return false;
+  let last = new Date(lastDate);
+  let cur = new Date(today);
+  let diff = (cur - last) / (1000 * 60 * 60 * 24);
+  return diff === 1;
+}
+
+//FOCUS MODE (POMODORO)
+let timerInterval = null;
+let timeLeft = 25 * 60;
+
+document.addEventListener("DOMContentLoaded", () => {
+  let durationSelect = document.getElementById("timerDuration");
+  durationSelect.addEventListener("change", () => {
+    timeLeft = parseInt(durationSelect.value) * 60;
+    updateTimerDisplay();
+  });
+});
+
+function updateTimerDisplay() {
+  let min = Math.floor(timeLeft / 60);
+  let sec = timeLeft % 60;
+  document.getElementById("timerDisplay").innerText =
+    `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+}
+
+function startTimer() {
+  if (timerInterval) return;
+
+  timerInterval = setInterval(() => {
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      alert("⏰ Focus session complete!");
+      return;
+    }
+    timeLeft--;
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function pauseTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  let duration = parseInt(document.getElementById("timerDuration").value);
+  timeLeft = duration * 60;
+  updateTimerDisplay();
+}
+
+//NOTES
 function addNote() {
-  let title = document.getElementById("noteTitle").value;
-  let text = document.getElementById("noteText").value;
+  let title = document.getElementById("noteTitle").value.trim();
+  let text = document.getElementById("noteText").value.trim();
 
   if (!title || !text) return alert("Write something!");
 
-  let summary = text.split(".").slice(0,2).join(".") + "...";
+  let summary = text.split(".").slice(0, 2).join(".") + "...";
 
-  notes.unshift({title, text, summary});
+  notes.unshift({ title, text, summary });
   localStorage.setItem("notes", JSON.stringify(notes));
+
+  document.getElementById("noteTitle").value = "";
+  document.getElementById("noteText").value = "";
+
   displayNotes();
 }
 
-function displayNotes() {
+function displayNotes(list) {
   let div = document.getElementById("notes");
   div.innerHTML = "";
 
-  notes.forEach(n => {
+  let source = list || notes;
+
+  source.forEach(n => {
     div.innerHTML += `
       <div class="note">
         <h3>${n.title}</h3>
@@ -80,7 +219,15 @@ function displayNotes() {
   });
 }
 
-// PDF PROCESS
+function searchNotes() {
+  let q = document.getElementById("noteSearch").value.toLowerCase();
+  let filtered = notes.filter(n =>
+    n.title.toLowerCase().includes(q) || n.text.toLowerCase().includes(q)
+  );
+  displayNotes(filtered);
+}
+
+//PDF PROCESS
 async function processFile() {
   let file = document.getElementById("fileInput").files[0];
   if (!file) return alert("Upload PDF");
@@ -98,33 +245,28 @@ async function processFile() {
   generate(text);
 }
 
-// GENERATE
+// GENERATE NOTES/QUIZ 
 function generate(text) {
-
-  // CLEAN TEXT
   text = text.replace(/\s+/g, " ").trim();
 
   let sentences = text.split(".").filter(s => s.length > 20);
 
-  //  NOTES
+  // NOTES
   generatedNotes = sentences.slice(0, 5).join(".") + ".";
 
   // QUIZ
   quizData = [];
 
   for (let i = 0; i < 3; i++) {
-
     let correct = sentences[i];
 
-    // wrong options
     let options = [
       correct,
-      sentences[i+1] || correct,
-      sentences[i+2] || correct,
+      sentences[i + 1] || correct,
+      sentences[i + 2] || correct,
       "None of the above"
     ];
 
-    // shuffle
     options = options.sort(() => Math.random() - 0.5);
 
     quizData.push({
@@ -136,9 +278,8 @@ function generate(text) {
 
   displayOutput();
 }
-// OUTPUT
-function displayOutput() {
 
+function displayOutput() {
   let html = "";
 
   if (mode === "notes") {
@@ -149,7 +290,7 @@ function displayOutput() {
     html = `<h3>🎯 Quiz from PDF</h3>`;
 
     quizData.forEach((q, i) => {
-      html += `<p>${i+1}. ${q.q}</p>`;
+      html += `<p>${i + 1}. ${q.q}</p>`;
 
       q.options.forEach(opt => {
         html += `
@@ -164,39 +305,38 @@ function displayOutput() {
   document.getElementById("output").innerHTML = html;
 }
 
-// SCORE
+// QUIZ SCORE 
 let total = 0;
-let correct = 0;
+let correctCount = 0;
 
 function checkAnswer(selected, answer) {
   total++;
 
   if (selected === answer) {
-    correct++;
+    correctCount++;
     alert("✅ Correct");
   } else {
     alert("❌ Wrong");
   }
 
-  let percent = Math.round((correct / total) * 100);
+  let percent = Math.round((correctCount / total) * 100);
   document.getElementById("score").innerText = percent + "%";
 }
 
-// SAVE GENERATED
+// SAVE / DOWNLOAD GENERATED NOTES
 function saveGeneratedNotes() {
   if (!generatedNotes) return alert("No notes generated!");
 
   notes.unshift({
-    title:"Generated",
-    text:generatedNotes,
-    summary:generatedNotes
+    title: "Generated",
+    text: generatedNotes,
+    summary: generatedNotes
   });
 
   localStorage.setItem("notes", JSON.stringify(notes));
   displayNotes();
 }
 
-// DOWNLOAD PDF
 function downloadGeneratedPDF() {
   if (!generatedNotes) return alert("No notes!");
 
@@ -209,6 +349,36 @@ function downloadGeneratedPDF() {
   doc.save("notes.pdf");
 }
 
-// INIT
+//EXPORT / CLEAR 
+function exportData() {
+  let data = { tasks, notes, streakData };
+  let blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  let url = URL.createObjectURL(blob);
+
+  let a = document.createElement("a");
+  a.href = url;
+  a.download = "study-planner-data.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function clearData() {
+  if (!confirm("This will delete all tasks and notes. Continue?")) return;
+
+  localStorage.removeItem("tasks");
+  localStorage.removeItem("notes");
+  localStorage.removeItem("streakData");
+
+  tasks = [];
+  notes = [];
+  streakData = { count: 0, lastDate: null };
+
+  display();
+  displayNotes();
+}
+
+// INIT 
 display();
 displayNotes();
+updateTimerDisplay();
