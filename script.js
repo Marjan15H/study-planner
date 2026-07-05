@@ -95,13 +95,23 @@ function generate(text) {
 }
 
 function displayOutput() {
-  let html = `<h3>${generatedNotes}</h3>`;
+  let html = "";
 
-  quizData.forEach((q, i) => {
-    html += `<p>${i+1}. ${q.q}</p>
-    <button onclick="check(${i})">Correct</button>
-    <button onclick="wrong()">Wrong</button>`;
-  });
+  if (mode === "notes") {
+    html += `<h3>🧠 Notes</h3><p>${generatedNotes}</p>`;
+  }
+
+  if (mode === "quiz") {
+    html += `<h3>❓ Quiz</h3>`;
+
+    quizData.forEach((q, i) => {
+      html += `
+        <p>${i+1}. ${q.q}</p>
+        <button onclick="check(${i})">✅ Correct</button>
+        <button onclick="wrong()">❌ Wrong</button>
+      `;
+    });
+  }
 
   document.getElementById("output").innerHTML = html;
 }
@@ -132,7 +142,12 @@ function downloadGeneratedPDF() {
 
   doc.save("notes.pdf");
 }
+let mode = "notes"; 
 
+function setMode(m) {
+  mode = m;
+  alert("Mode: " + m);
+}
 // INIT
 display();
 displayNotes();
