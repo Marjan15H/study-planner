@@ -1,5 +1,6 @@
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let streak = localStorage.getItem("streak") || 0;
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
 
 function save() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -141,5 +142,70 @@ function clearAll() {
   display();
 }
 
+function saveNotes() {
+  localStorage.setItem("notes", JSON.stringify(notes));
+}
+
+function displayNotes(list = notes) {
+  let div = document.getElementById("notes");
+  div.innerHTML = "";
+
+  list.forEach((n, i) => {
+    let note = document.createElement("div");
+    note.className = "note";
+
+    note.innerHTML = `
+      <h3>${n.title}</h3>
+      <p>${n.text}</p>
+      <button onclick="pinNote(${i})">📌 Pin</button>
+      <button onclick="deleteNote(${i})">❌ Delete</button>
+    `;
+
+    div.appendChild(note);
+  });
+}
+
+function addNote() {
+  let title = document.getElementById("noteTitle").value;
+  let text = document.getElementById("noteText").value;
+
+  if (!title || !text) return alert("Write something!");
+
+  notes.unshift({ title, text, pinned: false });
+
+  document.getElementById("noteTitle").value = "";
+  document.getElementById("noteText").value = "";
+
+  saveNotes();
+  displayNotes();
+}
+
+function deleteNote(i) {
+  notes.splice(i, 1);
+  saveNotes();
+  displayNotes();
+}
+
+function pinNote(i) {
+  notes[i].pinned = !notes[i].pinned;
+
+  notes.sort((a, b) => b.pinned - a.pinned);
+
+  saveNotes();
+  displayNotes();
+}
+
+function searchNote() {
+  let q = document.getElementById("noteSearch").value.toLowerCase();
+
+  let filtered = notes.filter(n =>
+    n.title.toLowerCase().includes(q) ||
+    n.text.toLowerCase().includes(q)
+  );
+
+  displayNotes(filtered);
+}
+
+displayNotes();
 display();
 update();

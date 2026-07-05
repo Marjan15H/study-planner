@@ -58,6 +58,17 @@
   <button onclick="start()">Start</button>
   <button onclick="pause()">Pause</button>
   <button onclick="reset()">Reset</button>
+  <h2>🧠 Smart Notes</h2>
+
+<div class="note-input">
+  <input id="noteTitle" placeholder="Title">
+  <textarea id="noteText" placeholder="Write your note..."></textarea>
+  <button onclick="addNote()">Save Note</button>
+</div>
+
+<input type="text" id="noteSearch" placeholder="Search notes..." onkeyup="searchNote()">
+
+<div id="notes"></div>
 </div>
 
 <div class="extra">
