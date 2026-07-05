@@ -1,4 +1,4 @@
-//DATA
+//DATA 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let notes = JSON.parse(localStorage.getItem("notes")) || [];
 let streakData = JSON.parse(localStorage.getItem("streakData")) || { count: 0, lastDate: null };
@@ -6,9 +6,28 @@ let streakData = JSON.parse(localStorage.getItem("streakData")) || { count: 0, l
 let generatedNotes = "";
 let quizData = [];
 
-let mode = "notes"; 
+let mode = "notes"; // default mode for PDF generation
 
-// MODE (PDF Notes/Quiz) 
+// THEME
+function applyTheme(theme) {
+  let btn = document.getElementById("themeToggle");
+  if (theme === "dark") {
+    document.body.classList.add("dark-mode");
+    btn.innerText = "☀️ Light";
+  } else {
+    document.body.classList.remove("dark-mode");
+    btn.innerText = "🌙 Dark";
+  }
+}
+
+function toggleTheme() {
+  let isDark = document.body.classList.contains("dark-mode");
+  let newTheme = isDark ? "light" : "dark";
+  localStorage.setItem("theme", newTheme);
+  applyTheme(newTheme);
+}
+
+//MODE (PDF Notes/Quiz)
 function setMode(m) {
   mode = m;
   document.querySelectorAll(".mode-select button").forEach(btn => {
@@ -17,7 +36,7 @@ function setMode(m) {
   event.target.classList.add("active-mode");
 }
 
-//TASKS 
+//TASKS
 function addTask() {
   let text = document.getElementById("taskInput").value.trim();
   let date = document.getElementById("taskDate").value;
@@ -118,7 +137,7 @@ function updateStreak() {
   let today = todayStr();
 
   if (streakData.lastDate === today) {
-    
+    // already counted today, do nothing
   } else if (isYesterday(streakData.lastDate, today)) {
     streakData.count += 1;
     streakData.lastDate = today;
@@ -148,6 +167,8 @@ document.addEventListener("DOMContentLoaded", () => {
     timeLeft = parseInt(durationSelect.value) * 60;
     updateTimerDisplay();
   });
+
+  applyTheme(localStorage.getItem("theme") || "light");
 });
 
 function updateTimerDisplay() {
@@ -227,7 +248,7 @@ function searchNotes() {
   displayNotes(filtered);
 }
 
-//PDF PROCESS
+// PDF PROCESS 
 async function processFile() {
   let file = document.getElementById("fileInput").files[0];
   if (!file) return alert("Upload PDF");
@@ -245,7 +266,7 @@ async function processFile() {
   generate(text);
 }
 
-// GENERATE NOTES/QUIZ 
+//GENERATE NOTES/QUIZ
 function generate(text) {
   text = text.replace(/\s+/g, " ").trim();
 
@@ -305,7 +326,7 @@ function displayOutput() {
   document.getElementById("output").innerHTML = html;
 }
 
-// QUIZ SCORE 
+//QUIZ SCORE
 let total = 0;
 let correctCount = 0;
 
@@ -323,7 +344,7 @@ function checkAnswer(selected, answer) {
   document.getElementById("score").innerText = percent + "%";
 }
 
-// SAVE / DOWNLOAD GENERATED NOTES
+//SAVE / DOWNLOAD GENERATED NOTES
 function saveGeneratedNotes() {
   if (!generatedNotes) return alert("No notes generated!");
 
@@ -349,7 +370,7 @@ function downloadGeneratedPDF() {
   doc.save("notes.pdf");
 }
 
-//EXPORT / CLEAR 
+//EXPORT / CLEAR
 function exportData() {
   let data = { tasks, notes, streakData };
   let blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -378,7 +399,7 @@ function clearData() {
   displayNotes();
 }
 
-// INIT 
+//INIT
 display();
 displayNotes();
 updateTimerDisplay();
