@@ -1,4 +1,4 @@
-//DATA 
+// DATA
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let notes = JSON.parse(localStorage.getItem("notes")) || [];
 let streakData = JSON.parse(localStorage.getItem("streakData")) || { count: 0, lastDate: null };
@@ -8,7 +8,7 @@ let quizData = [];
 
 let mode = "notes"; // default mode for PDF generation
 
-// THEME
+//THEME
 function applyTheme(theme) {
   let btn = document.getElementById("themeToggle");
   if (theme === "dark") {
@@ -27,7 +27,7 @@ function toggleTheme() {
   applyTheme(newTheme);
 }
 
-//MODE (PDF Notes/Quiz)
+// MODE (PDF Notes/Quiz)
 function setMode(m) {
   mode = m;
   document.querySelectorAll(".mode-select button").forEach(btn => {
@@ -206,7 +206,7 @@ function resetTimer() {
   updateTimerDisplay();
 }
 
-//NOTES
+// NOTES
 function addNote() {
   let title = document.getElementById("noteTitle").value.trim();
   let text = document.getElementById("noteText").value.trim();
@@ -248,7 +248,7 @@ function searchNotes() {
   displayNotes(filtered);
 }
 
-// PDF PROCESS 
+//PDF PROCESS
 async function processFile() {
   let file = document.getElementById("fileInput").files[0];
   if (!file) return alert("Upload PDF");
@@ -370,7 +370,7 @@ function downloadGeneratedPDF() {
   doc.save("notes.pdf");
 }
 
-//EXPORT / CLEAR
+//EXPORT / CLEAR 
 function exportData() {
   let data = { tasks, notes, streakData };
   let blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
