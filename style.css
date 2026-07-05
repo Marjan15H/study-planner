@@ -96,3 +96,38 @@ textarea {
 .note button {
   margin-top: 5px;
 }
+@media (max-width: 600px) {
+
+  .container {
+    padding: 10px;
+  }
+
+  header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .input-box {
+    display: flex;
+    flex-direction: column;
+  }
+
+  input, select, button {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .timer {
+    font-size: 18px;
+  }
+
+  textarea {
+    width: 100%;
+  }
+
+}

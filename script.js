@@ -155,11 +155,12 @@ function displayNotes(list = notes) {
     note.className = "note";
 
     note.innerHTML = `
-      <h3>${n.title}</h3>
-      <p>${n.text}</p>
-      <button onclick="pinNote(${i})">📌 Pin</button>
-      <button onclick="deleteNote(${i})">❌ Delete</button>
-    `;
+  <h3>${n.title}</h3>
+  <p><b>🧠 AI Summary:</b> ${n.summary}</p>
+  <p>${n.text}</p>
+  <button onclick="pinNote(${i})">📌</button>
+  <button onclick="deleteNote(${i})">❌</button>
+`;
 
     div.appendChild(note);
   });
@@ -171,7 +172,9 @@ function addNote() {
 
   if (!title || !text) return alert("Write something!");
 
-  notes.unshift({ title, text, pinned: false });
+  let summary = summarizeText(text);
+
+  notes.unshift({ title, text, summary, pinned: false });
 
   document.getElementById("noteTitle").value = "";
   document.getElementById("noteText").value = "";
@@ -205,7 +208,13 @@ function searchNote() {
 
   displayNotes(filtered);
 }
+function summarizeText(text) {
+  let sentences = text.split(".");
+  
+  if (sentences.length <= 2) return text;
 
+  return sentences.slice(0, 2).join(".") + "...";
+}
 displayNotes();
 display();
 update();
