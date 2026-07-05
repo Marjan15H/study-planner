@@ -95,35 +95,64 @@ async function processFile() {
 
 // GENERATE
 function generate(text) {
-  let sentences = text.split(".").slice(0,5);
 
-  generatedNotes = sentences.join(".") + "...";
+  // CLEAN TEXT
+  text = text.replace(/\s+/g, " ").trim();
 
-  quizData = sentences.map(s => ({
-    q: s,
-    answer: s
-  }));
+  let sentences = text.split(".").filter(s => s.length > 20);
+
+  //  NOTES 
+  generatedNotes = sentences.slice(0, 5).join(".") + ".";
+
+  // QUIZ 
+  quizData = [];
+
+  for (let i = 0; i < 3; i++) {
+
+    let correct = sentences[i];
+
+    // wrong options 
+    let options = [
+      correct,
+      sentences[i+1] || correct,
+      sentences[i+2] || correct,
+      "None of the above"
+    ];
+
+    // shuffle
+    options = options.sort(() => Math.random() - 0.5);
+
+    quizData.push({
+      q: "What is correct about:",
+      options: options,
+      answer: correct
+    });
+  }
 
   displayOutput();
 }
-
 // OUTPUT 
 function displayOutput() {
+
   let html = "";
 
   if (mode === "notes") {
-    html = `<h3>🧠 Notes</h3><p>${generatedNotes}</p>`;
+    html = `<h3>🧠 Notes from PDF</h3><p>${generatedNotes}</p>`;
   }
 
   if (mode === "quiz") {
-    html = `<h3>❓ Quiz</h3>`;
+    html = `<h3>🎯 Quiz from PDF</h3>`;
 
     quizData.forEach((q, i) => {
-      html += `
-        <p>${i+1}. ${q.q}</p>
-        <button onclick="check(${i})">✅ Correct</button>
-        <button onclick="wrong()">❌ Wrong</button>
-      `;
+      html += `<p>${i+1}. ${q.q}</p>`;
+
+      q.options.forEach(opt => {
+        html += `
+          <button onclick="checkAnswer('${opt}','${q.answer}')">
+            ${opt}
+          </button>
+        `;
+      });
     });
   }
 
@@ -131,13 +160,21 @@ function displayOutput() {
 }
 
 // SCORE
-function check(i) {
-  score++;
-  document.getElementById("score").innerText = score;
-}
+let total = 0;
+let correct = 0;
 
-function wrong() {
-  alert("Wrong!");
+function checkAnswer(selected, answer) {
+  total++;
+
+  if (selected === answer) {
+    correct++;
+    alert("✅ Correct");
+  } else {
+    alert("❌ Wrong");
+  }
+
+  let percent = Math.round((correct / total) * 100);
+  document.getElementById("score").innerText = percent + "%";
 }
 
 // SAVE GENERATED
