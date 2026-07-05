@@ -5,10 +5,19 @@ let generatedNotes = "";
 let quizData = [];
 let score = 0;
 
+let mode = "notes"; // 🔥 FIX
+
+// MODE
+function setMode(m) {
+  mode = m;
+  alert("Mode: " + m);
+}
+
 // TASK
 function addTask() {
   let val = document.getElementById("taskInput").value;
   if (!val) return;
+
   tasks.push(val);
   localStorage.setItem("tasks", JSON.stringify(tasks));
   display();
@@ -17,6 +26,7 @@ function addTask() {
 function display() {
   let ul = document.getElementById("taskList");
   ul.innerHTML = "";
+
   tasks.forEach((t, i) => {
     ul.innerHTML += `<li>${t} <button onclick="del(${i})">❌</button></li>`;
   });
@@ -42,6 +52,8 @@ function addNote() {
   let title = document.getElementById("noteTitle").value;
   let text = document.getElementById("noteText").value;
 
+  if (!title || !text) return alert("Write something!");
+
   let summary = text.split(".").slice(0,2).join(".") + "...";
 
   notes.unshift({title, text, summary});
@@ -63,12 +75,13 @@ function displayNotes() {
   });
 }
 
-// PDF PROCESS
+// PDF PROCESS 
 async function processFile() {
   let file = document.getElementById("fileInput").files[0];
   if (!file) return alert("Upload PDF");
 
   let pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
+
   let text = "";
 
   for (let i = 1; i <= pdf.numPages; i++) {
@@ -77,10 +90,10 @@ async function processFile() {
     text += content.items.map(i => i.str).join(" ");
   }
 
-  generate(text);
+  generate(text); 
 }
 
-// GENERATE NOTES + QUIZ
+// GENERATE
 function generate(text) {
   let sentences = text.split(".").slice(0,5);
 
@@ -94,15 +107,16 @@ function generate(text) {
   displayOutput();
 }
 
+// OUTPUT 
 function displayOutput() {
   let html = "";
 
   if (mode === "notes") {
-    html += `<h3>🧠 Notes</h3><p>${generatedNotes}</p>`;
+    html = `<h3>🧠 Notes</h3><p>${generatedNotes}</p>`;
   }
 
   if (mode === "quiz") {
-    html += `<h3>❓ Quiz</h3>`;
+    html = `<h3>❓ Quiz</h3>`;
 
     quizData.forEach((q, i) => {
       html += `
@@ -116,6 +130,7 @@ function displayOutput() {
   document.getElementById("output").innerHTML = html;
 }
 
+// SCORE
 function check(i) {
   score++;
   document.getElementById("score").innerText = score;
@@ -127,13 +142,22 @@ function wrong() {
 
 // SAVE GENERATED
 function saveGeneratedNotes() {
-  notes.unshift({title:"Generated", text:generatedNotes, summary:generatedNotes});
+  if (!generatedNotes) return alert("No notes generated!");
+
+  notes.unshift({
+    title:"Generated",
+    text:generatedNotes,
+    summary:generatedNotes
+  });
+
   localStorage.setItem("notes", JSON.stringify(notes));
   displayNotes();
 }
 
-// PDF DOWNLOAD
+// DOWNLOAD PDF
 function downloadGeneratedPDF() {
+  if (!generatedNotes) return alert("No notes!");
+
   const { jsPDF } = window.jspdf;
   let doc = new jsPDF();
 
@@ -142,12 +166,7 @@ function downloadGeneratedPDF() {
 
   doc.save("notes.pdf");
 }
-let mode = "notes"; 
 
-function setMode(m) {
-  mode = m;
-  alert("Mode: " + m);
-}
 // INIT
 display();
 displayNotes();

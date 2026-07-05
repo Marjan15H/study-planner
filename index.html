@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Study Planner PRO</title>
+<title>Study Planner</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -27,7 +27,6 @@
 
 <!-- NOTES -->
 <h2>🧠 Smart Notes</h2>
-
 <input id="noteTitle" placeholder="Title">
 <textarea id="noteText" placeholder="Write note..."></textarea>
 <button onclick="addNote()">Save Note</button>
@@ -36,7 +35,16 @@
 
 <hr>
 
-<!-- FILE UPLOAD -->
+<!-- MODE SELECT -->
+<h3>Choose Mode</h3>
+<div class="mode-select">
+  <button onclick="setMode('notes')">🧠 Notes</button>
+  <button onclick="setMode('quiz')">❓ Quiz</button>
+</div>
+
+<hr>
+
+<!-- FILE -->
 <h2>📂 Upload PDF</h2>
 <input type="file" id="fileInput" accept=".pdf">
 <button onclick="processFile()">Generate</button>
@@ -49,18 +57,10 @@
 <button onclick="downloadGeneratedPDF()">📄 Download PDF</button>
 
 </div>
-<h3>Choose Mode</h3>
-
-<div class="mode-select">
-  <button onclick="setMode('notes')">🧠 Notes</button>
-  <button onclick="setMode('quiz')">❓ Quiz</button>
-</div>
 
 <script src="script.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pptxgenjs/dist/pptxgen.min.js"></script>
 
 </body>
 </html>
-

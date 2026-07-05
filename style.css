@@ -1,7 +1,7 @@
 body {
   font-family: Arial;
   margin: 0;
-  background: linear-gradient(135deg,#667eea,#764ba2);
+  background: linear-gradient(135deg,#667eea,#7c96b6);
   color: white;
 }
 
@@ -131,3 +131,9 @@ textarea {
   }
 
 }
+.mode-select button {
+  margin: 5px;
+  padding: 10px;
+  background: #222;
+  color: white;
+} 
