@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Study Planner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Study Planner</h1>
+
+<input type="text" id="taskInput" placeholder="Enter task">
+<input type="date" id="deadline">
+<select id="priority">
+  <option>High</option>
+  <option>Medium</option>
+  <option>Low</option>
+</select>
+
+<button onclick="addTask()">Add Task</button>
+
+<ul id="taskList"></ul>
+
+<hr>
+
+<h2>⏱ Pomodoro Timer</h2>
+<p id="timer">25:00</p>
+<button onclick="startTimer()">Start</button>
+<button onclick="resetTimer()">Reset</button>
+
+<br><br>
+<a href="info.html">About This App</a>
+
+<script src="script.js"></script>
+</body>
+</html>
