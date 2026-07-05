@@ -136,4 +136,10 @@ textarea {
   padding: 10px;
   background: #222;
   color: white;
-} 
+  border: 2px solid transparent;
+}
+
+.mode-select button.active-mode {
+  border: 2px solid lime;
+  background: #000;
+}

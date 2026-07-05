@@ -35,18 +35,17 @@
 
 <hr>
 
-<!-- MODE SELECT -->
+<!-- FILE -->
+<h2>📂 Upload PDF</h2>
+<input type="file" id="fileInput" accept=".pdf">
+
+<!-- MODE SELECT (moved below Upload PDF, above Generate) -->
 <h3>Choose Mode</h3>
 <div class="mode-select">
   <button onclick="setMode('notes')">🧠 Notes</button>
   <button onclick="setMode('quiz')">❓ Quiz</button>
 </div>
 
-<hr>
-
-<!-- FILE -->
-<h2>📂 Upload PDF</h2>
-<input type="file" id="fileInput" accept=".pdf">
 <button onclick="processFile()">Generate</button>
 
 <div id="output"></div>

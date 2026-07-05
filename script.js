@@ -5,12 +5,17 @@ let generatedNotes = "";
 let quizData = [];
 let score = 0;
 
-let mode = "notes"; // 🔥 FIX
+let mode = "notes"; // default mode
 
 // MODE
 function setMode(m) {
   mode = m;
-  alert("Mode: " + m);
+
+  // highlight active mode button
+  document.querySelectorAll(".mode-select button").forEach(btn => {
+    btn.classList.remove("active-mode");
+  });
+  event.target.classList.add("active-mode");
 }
 
 // TASK
@@ -75,7 +80,7 @@ function displayNotes() {
   });
 }
 
-// PDF PROCESS 
+// PDF PROCESS
 async function processFile() {
   let file = document.getElementById("fileInput").files[0];
   if (!file) return alert("Upload PDF");
@@ -90,7 +95,7 @@ async function processFile() {
     text += content.items.map(i => i.str).join(" ");
   }
 
-  generate(text); 
+  generate(text);
 }
 
 // GENERATE
@@ -101,17 +106,17 @@ function generate(text) {
 
   let sentences = text.split(".").filter(s => s.length > 20);
 
-  //  NOTES 
+  //  NOTES
   generatedNotes = sentences.slice(0, 5).join(".") + ".";
 
-  // QUIZ 
+  // QUIZ
   quizData = [];
 
   for (let i = 0; i < 3; i++) {
 
     let correct = sentences[i];
 
-    // wrong options 
+    // wrong options
     let options = [
       correct,
       sentences[i+1] || correct,
@@ -131,7 +136,7 @@ function generate(text) {
 
   displayOutput();
 }
-// OUTPUT 
+// OUTPUT
 function displayOutput() {
 
   let html = "";
