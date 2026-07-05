@@ -1,5 +1,5 @@
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let todayCount = 0;
+let streak = localStorage.getItem("streak") || 0;
 
 function save() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -12,12 +12,11 @@ function display(list = tasks) {
   list.forEach((t, i) => {
     let li = document.createElement("li");
 
-    let overdue = t.date && new Date(t.date) < new Date() ? "overdue" : "";
-    li.className = overdue;
+    li.className = t.priority;
 
     li.innerHTML = `
       <span style="text-decoration:${t.done ? "line-through" : ""}">
-        ${t.name} (${t.category})
+        ${t.name} (${t.category}) - ${t.priority}
       </span>
       <div>
         <button onclick="toggle(${i})">✔</button>
@@ -28,19 +27,26 @@ function display(list = tasks) {
     ul.appendChild(li);
   });
 
-  document.getElementById("stats").innerText = todayCount;
+  document.getElementById("stats").innerText =
+    tasks.filter(t => t.done).length;
+
+  document.getElementById("streak").innerText = streak;
+
+  updateProgress();
 }
 
 function addTask() {
   let name = document.getElementById("taskInput").value;
   let date = document.getElementById("date").value;
   let category = document.getElementById("category").value;
+  let priority = document.getElementById("priority").value;
 
   if (!name) return alert("Enter task!");
 
-  tasks.push({ name, date, category, done: false });
+  tasks.push({ name, date, category, priority, done: false });
 
   document.getElementById("taskInput").value = "";
+
   save();
   display();
 }
@@ -48,7 +54,11 @@ function addTask() {
 function toggle(i) {
   tasks[i].done = !tasks[i].done;
 
-  todayCount = tasks.filter(t => t.done).length;
+  if (tasks.every(t => t.done)) {
+    streak++;
+    localStorage.setItem("streak", streak);
+    alert("🔥 Streak Increased!");
+  }
 
   save();
   display();
@@ -66,19 +76,19 @@ function searchTask() {
   display(filtered);
 }
 
+function updateProgress() {
+  let done = tasks.filter(t => t.done).length;
+  let percent = tasks.length ? (done / tasks.length) * 100 : 0;
+  document.getElementById("progress").style.width = percent + "%";
+}
+
 // DARK MODE
 function toggleDark() {
   document.body.classList.toggle("dark");
-  localStorage.setItem("dark", document.body.classList.contains("dark"));
-}
-
-if (localStorage.getItem("dark") === "true") {
-  document.body.classList.add("dark");
 }
 
 // TIMER
-let time = 1500;
-let interval = null;
+let time = 1500, interval;
 
 function start() {
   time = parseInt(document.getElementById("mode").value);
@@ -89,7 +99,7 @@ function start() {
     if (time <= 0) {
       clearInterval(interval);
       interval = null;
-      alert("Time's up!");
+      alert("⏰ Time's up!");
       return;
     }
 
@@ -118,6 +128,18 @@ function update() {
     `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-// INITIAL LOAD
+
+function exportData() {
+  let data = JSON.stringify(tasks);
+  navigator.clipboard.writeText(data);
+  alert("Copied!");
+}
+
+function clearAll() {
+  tasks = [];
+  save();
+  display();
+}
+
 display();
 update();
